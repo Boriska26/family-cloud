@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:17
+    ports: 
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: familycloud_test
+      POSTGRES_USER: boris
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - database:/var/lib/postgresql/data
+
+volumes:
+  database:
