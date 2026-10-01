@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FamilyCloud.Api/FamilyCloud.Api.csproj" />
+  </Folder>
+</Solution>
