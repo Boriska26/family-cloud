@@ -1,4 +1,9 @@
+using FamilyCloud.Application.Photos.Upload;
+using FamilyCloud.Application.Repositories;
+using FamilyCloud.Application.Services.FileStorage;
 using FamilyCloud.Infrastructure.DataAccess;
+using FamilyCloud.Infrastructure.Repositories;
+using FamilyCloud.Infrastructure.Services.FileStorage;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,13 +17,33 @@ builder.Services.AddDbContext<FamilyCloudDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
+
+builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>()
+    .AddScoped<IPhotoRepository, PhotoRepository>()
+    .AddScoped<UploadPhotoService>();
+
+builder.Services.Configure<FileStorageOptions>(
+    builder.Configuration.GetSection("FileStorage"));
+
+builder.Services.AddControllers();
+
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.MapControllers();
 
 app.UseHttpsRedirection();
 

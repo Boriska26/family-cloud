@@ -2,22 +2,57 @@
 {
     public class Photo
     {
-        public Photo() { }
+        private Photo() { }
 
-        public Guid Id { get; set; }
+        public Photo(string sourceName, long size, string mimeType)
+        {
+            Id = Guid.NewGuid();
+            if (string.IsNullOrWhiteSpace(sourceName))
+                throw new ArgumentNullException(nameof(sourceName));
+            if (size <= 0)
+                throw new ArgumentNullException(nameof(size));
+            if (string.IsNullOrWhiteSpace(mimeType))
+                throw new ArgumentNullException(mimeType);
 
-        public string SourceName { get; set; } = string.Empty;
+            SourceName = sourceName;
+            Size = size;
+            MimeType = mimeType;
+        }
 
-        public string StorageKey { get; set; } = string.Empty;
+        public Guid Id { get; private set; }
 
-        public int Height { get; set; }
+        public string SourceName { get; private set; } = string.Empty;
 
-        public int Width { get; set; }
+        public string StorageKey { get; private set; } = string.Empty;
 
-        public string MimeType { get; set; } = string.Empty;
+        public int Height { get; private set; }
 
-        public long Size { get; set; }
+        public int Width { get; private set; }
 
-        public DateTimeOffset UploadedAt { get; set; }
+        public string MimeType { get; private set; } = string.Empty;
+
+        public long Size { get; private set; }
+
+        public DateTimeOffset UploadedAt { get; private set; }
+
+        public void SetStorageKey(string storageKey)
+        {
+            if (string.IsNullOrWhiteSpace(storageKey))
+            {
+                throw new ArgumentException(nameof(storageKey));
+            }
+
+            StorageKey = storageKey;
+        }
+
+        public void MarkAsUploadedAt(DateTimeOffset dateTime)
+        {
+            if (UploadedAt != default)
+            {
+                throw new InvalidOperationException("Date has uploaded date time");
+            }
+
+            UploadedAt = dateTime;
+        }
     }
 }
