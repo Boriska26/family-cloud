@@ -37,5 +37,16 @@ namespace FamilyCloud.Infrastructure.Services.FileStorage
 
             return $"{directoryName}/{fileSaveOptions.Id}/{fileName}";
         }
+
+        public Stream OpenRead(string storageKey)
+        {
+            string filePath = Path.Combine(_options.RootPath, storageKey);
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException();
+
+            Stream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+
+            return stream;
+        }
     }
 }

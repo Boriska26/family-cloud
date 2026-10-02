@@ -1,3 +1,4 @@
+using FamilyCloud.Application.Photos.Get;
 using FamilyCloud.Application.Photos.Upload;
 using FamilyCloud.Application.Repositories;
 using FamilyCloud.Application.Services.FileStorage;
@@ -22,7 +23,8 @@ builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>()
     .AddScoped<IPhotoRepository, PhotoRepository>()
-    .AddScoped<UploadPhotoService>();
+    .AddScoped<UploadPhotoService>()
+    .AddScoped<GetPhotoService>();
 
 builder.Services.Configure<FileStorageOptions>(
     builder.Configuration.GetSection("FileStorage"));

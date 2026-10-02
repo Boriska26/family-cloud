@@ -6,5 +6,7 @@
             Stream stream,
             FileSaveOptions options,
             CancellationToken cancellationToken);
+
+        Stream OpenRead(string storageKey);
     }
 }

@@ -1,4 +1,6 @@
-﻿using FamilyCloud.Application.Photos.Upload;
+﻿using FamilyCloud.Application.Photos.Get;
+using FamilyCloud.Application.Photos.Upload;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FamilyCloud.Api.Controllers
@@ -20,6 +22,18 @@ namespace FamilyCloud.Api.Controllers
             Guid newId = await uploadPhotoService.UploadAsync(uploadPhotoRequest, cancellationToken);
 
             return Ok(newId);
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetPhotoById(Guid id, [FromServices] GetPhotoService getPhotoService, CancellationToken cancellationToken)
+        {
+            GetPhotoResult? getPhotoResult = await getPhotoService.GetByIdAsync(id, cancellationToken);
+            if (getPhotoResult == null)
+            {
+                return NotFound("Фотография не найдена");
+            }
+
+            return File(getPhotoResult.PhotoStream, getPhotoResult.ContentType, getPhotoResult.FileName);
         }
     }
 }
