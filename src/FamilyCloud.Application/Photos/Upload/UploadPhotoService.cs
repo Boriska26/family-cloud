@@ -24,19 +24,20 @@ namespace FamilyCloud.Application.Photos.Upload
             UploadPhotoRequest request,
             CancellationToken cancellationToken)
         {
-            Photo photo = new Photo(request.SourceName, request.Size, request.MimeType);
+            Photo photo = Photo.Create(request.SourceName, request.Size, request.MimeType);
             await using var transaction = await _unitOfWork
                 .BeginTransactionAsync(cancellationToken);
 
             string extension = Path.GetExtension(request.SourceName);
 
-            FileSaveOptions fileSaveOptions = new FileSaveOptions(photo.Id, extension);
+            FileSaveOptions fileSaveOptions = new FileSaveOptions(photo.Id, extension, PhotoVariant.Original);
             string storageKey = await _fileStorage.SaveFileAsync(
                 request.Stream,
                 fileSaveOptions,
                 cancellationToken);
 
-            photo.SetStorageKey(storageKey);
+            PhotoFile photoFile = photo.GetOriginalFile();
+            photoFile.SetStorageKey(storageKey);
             photo.MarkAsUploadedAt(DateTimeOffset.UtcNow);
 
             _photoRepository.Add(photo);

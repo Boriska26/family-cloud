@@ -1,4 +1,5 @@
 ﻿using FamilyCloud.Application.Services.FileStorage;
+using FamilyCloud.Domain;
 using Microsoft.Extensions.Options;
 
 namespace FamilyCloud.Infrastructure.Services.FileStorage
@@ -25,7 +26,14 @@ namespace FamilyCloud.Infrastructure.Services.FileStorage
 
             Directory.CreateDirectory(path);
 
-            string fileName = $"original{fileSaveOptions.Extension}";
+            string variant = fileSaveOptions.Variant switch
+            {
+                PhotoVariant.Original => "original",
+                PhotoVariant.Thumbnail => "thumbnail",
+                _ => throw new InvalidOperationException()
+            };
+            string fileName = $"{variant}{fileSaveOptions.Extension}";
+
             string fullPath = Path.Combine(path, fileName);
 
             using FileStream fileStream = new FileStream(

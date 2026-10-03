@@ -28,33 +28,61 @@ namespace FamilyCloud.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Height")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("MimeType")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("Size")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("SourceName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("StorageKey")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("UploadedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Width")
+                    b.HasKey("Id");
+
+                    b.ToTable("Photos");
+                });
+
+            modelBuilder.Entity("FamilyCloud.Domain.PhotoFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("MimeType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PhotoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("StorageKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Variant")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Photos");
+                    b.HasIndex("PhotoId", "Variant")
+                        .IsUnique();
+
+                    b.ToTable("PhotoFiles");
+                });
+
+            modelBuilder.Entity("FamilyCloud.Domain.PhotoFile", b =>
+                {
+                    b.HasOne("FamilyCloud.Domain.Photo", null)
+                        .WithMany("Files")
+                        .HasForeignKey("PhotoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FamilyCloud.Domain.Photo", b =>
+                {
+                    b.Navigation("Files");
                 });
 #pragma warning restore 612, 618
         }

@@ -2,48 +2,26 @@
 {
     public class Photo
     {
+        private readonly List<PhotoFile> _files = [];
+
         private Photo() { }
 
-        public Photo(string sourceName, long size, string mimeType)
+        private Photo(string sourceName)
         {
             Id = Guid.NewGuid();
             if (string.IsNullOrWhiteSpace(sourceName))
                 throw new ArgumentNullException(nameof(sourceName));
-            if (size <= 0)
-                throw new ArgumentNullException(nameof(size));
-            if (string.IsNullOrWhiteSpace(mimeType))
-                throw new ArgumentNullException(mimeType);
 
             SourceName = sourceName;
-            Size = size;
-            MimeType = mimeType;
         }
 
         public Guid Id { get; private set; }
 
         public string SourceName { get; private set; } = string.Empty;
 
-        public string StorageKey { get; private set; } = string.Empty;
-
-        public int Height { get; private set; }
-
-        public int Width { get; private set; }
-
-        public string MimeType { get; private set; } = string.Empty;
-
-        public long Size { get; private set; }
-
         public DateTimeOffset UploadedAt { get; private set; }
 
-        public void SetStorageKey(string storageKey)
-        {
-            if (string.IsNullOrWhiteSpace(storageKey))
-            {
-                throw new ArgumentException(nameof(storageKey));
-            }
-
-            StorageKey = storageKey;
-        }
+        public IReadOnlyCollection<PhotoFile> Files => _files;
 
         public void MarkAsUploadedAt(DateTimeOffset dateTime)
         {
@@ -53,6 +31,43 @@
             }
 
             UploadedAt = dateTime;
+        }
+
+        public static Photo Create(string sourceName, long size, string mimeType)
+        {
+            Photo photo = new Photo(sourceName);
+            photo.AddFile(PhotoVariant.Original, size, mimeType);
+
+            return photo;
+        }
+
+        public PhotoFile AddFile(PhotoVariant variant, long size, string mimeType)
+        {
+            if (_files.Any(n => n.Variant == variant))
+            {
+                throw new InvalidOperationException($"Файл варианта {variant} уже существует");
+            }
+
+            PhotoFile photoFile = new PhotoFile(variant, size, mimeType, Id);
+            _files.Add(photoFile);
+
+            return photoFile;
+        }
+
+        public PhotoFile GetOriginalFile()
+        {
+            PhotoFile? originalFile = GetFile(PhotoVariant.Original);
+            if (originalFile == null)
+            {
+                throw new InvalidOperationException($"Файл {PhotoVariant.Original} не существует");
+            }
+
+            return originalFile;
+        }
+
+        public PhotoFile? GetFile(PhotoVariant variant)
+        {
+            return _files.FirstOrDefault(n => n.Variant == variant);
         }
     }
 }
