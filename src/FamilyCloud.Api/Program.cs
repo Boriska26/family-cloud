@@ -4,6 +4,7 @@ using FamilyCloud.Application.Photos.Upload;
 using FamilyCloud.Application.Repositories;
 using FamilyCloud.Application.Services.FileStorage;
 using FamilyCloud.Infrastructure.DataAccess;
+using FamilyCloud.Infrastructure.RabbitMq;
 using FamilyCloud.Infrastructure.Repositories;
 using FamilyCloud.Infrastructure.Services.FileStorage;
 using FamilyCloud.Infrastructure.Services.ImageProcessing;
@@ -21,14 +22,17 @@ builder.Services.AddDbContext<FamilyCloudDbContext>(options =>
     options.UseNpgsql(connectionString);
 });
 
-builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
+builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>()
     .AddScoped<IPhotoRepository, PhotoRepository>()
     .AddScoped<UploadPhotoService>()
     .AddScoped<GetPhotoService>()
     .AddScoped<CreateThumbnailService>()
-    .AddScoped<IImageProcessor, SkiaImageProcessor>();
+    .AddScoped<IImageProcessor, SkiaImageProcessor>()
+    .AddScoped<IFileStorage, LocalFileStorage>();
+
+builder.Services.AddSingleton<RabbitMqConnection>();
 
 builder.Services.Configure<FileStorageOptions>(
     builder.Configuration.GetSection("FileStorage"));

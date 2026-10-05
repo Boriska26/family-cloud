@@ -9,6 +9,18 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - database:/var/lib/postgresql/data
+  #RABITMQ
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASSWORD: ${RABBITMQ_PASSWORD}
+    volumes:
+       - rabbitmq_data:/var/lib/rabbitmq
 
 volumes:
   database:
+  rabbitmq_data:
