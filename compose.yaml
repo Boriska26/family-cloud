@@ -9,6 +9,12 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U boris -d familycloud_test"]
+      interval: 5s
+      timeout: 30s
+      retries: 10
+
   #RABITMQ
   rabbitmq:
     image: rabbitmq:4-management
@@ -17,10 +23,51 @@ services:
       - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     volumes:
-       - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running"]
+      interval: 5s
+      timeout: 30s
+      retries: 10
+
+  #API
+  api:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: "src/FamilyCloud.Api/Dockerfile"
+    environment:
+      FileStorage__RootPath: /app/photos
+      RabbitMq__Password: ${RABBITMQ_PASSWORD}
+      ConnectionStrings__familydatabase_test: "Host=postgres;Port=5432;Database=familycloud_test;Username=boris;password=${POSTGRES_PASSWORD}"
+    ports:
+      - "80:8080"
+    volumes:
+      - /home/boris/FamilyCloudData:/app/photos
+    
+  worker:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+          condition: service_healthy
+    build:
+      context: .
+      dockerfile: "src/FamilyCloud.Worker/Dockerfile"
+    environment:
+      FileStorage__RootPath: /app/photos
+      RabbitMq__Password: ${RABBITMQ_PASSWORD}
+      ConnectionStrings__familydatabase_test: "Host=postgres;Port=5432;Database=familycloud_test;Username=boris;password=${POSTGRES_PASSWORD}"
+    volumes:
+      - /home/boris/FamilyCloudData:/app/photos
 
 volumes:
   database:
   rabbitmq_data:
+  

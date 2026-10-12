@@ -23,8 +23,6 @@ namespace FamilyCloud.Infrastructure.RabbitMq
 
             await using var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
 
-            await channel.ExchangeDeclareAsync(_rabbitMqOptions.ExchangeName, ExchangeType.Fanout, cancellationToken: cancellationToken);
-
             string photoUploadJson = JsonSerializer.Serialize(photoUploaded);
             byte[] photoUploadBytes = Encoding.UTF8.GetBytes(photoUploadJson);
 
