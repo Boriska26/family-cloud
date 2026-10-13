@@ -1,4 +1,5 @@
 using FamilyCloud.Application.Photos.Events;
+using FamilyCloud.Infrastructure.RabbitMq.Publishers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

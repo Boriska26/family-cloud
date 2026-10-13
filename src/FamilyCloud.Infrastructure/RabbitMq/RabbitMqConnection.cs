@@ -37,6 +37,8 @@ namespace FamilyCloud.Infrastructure.RabbitMq
                 factory.Password = _options.Password;
                 factory.Port = _options.Port;
                 factory.HostName = _options.Host;
+                factory.AutomaticRecoveryEnabled = true;
+                factory.TopologyRecoveryEnabled = true;
 
                 _connection = await factory.CreateConnectionAsync(cancellationToken);
             }

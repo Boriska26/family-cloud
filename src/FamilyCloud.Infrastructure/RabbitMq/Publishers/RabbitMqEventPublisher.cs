@@ -4,17 +4,15 @@ using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
 
-namespace FamilyCloud.Infrastructure.RabbitMq
+namespace FamilyCloud.Infrastructure.RabbitMq.Publishers
 {
     public class RabbitMqEventPublisher : IEventPublisher
     {
         private readonly RabbitMqConnection _rabbitMqConnection;
-        private readonly RabbitMqOptions _rabbitMqOptions;
 
-        public RabbitMqEventPublisher(RabbitMqConnection rabbitMqConnection, IOptions<RabbitMqOptions> options)
+        public RabbitMqEventPublisher(RabbitMqConnection rabbitMqConnection)
         {
             _rabbitMqConnection = rabbitMqConnection;
-            _rabbitMqOptions = options.Value;
         }
 
         public async Task PublishAsync(PhotoUploaded photoUploaded, CancellationToken cancellationToken)
@@ -32,7 +30,13 @@ namespace FamilyCloud.Infrastructure.RabbitMq
                 Persistent = true
             };
 
-            await channel.BasicPublishAsync(_rabbitMqOptions.ExchangeName, string.Empty, true, basicProperties, photoUploadBytes, cancellationToken);
+            await channel.BasicPublishAsync(
+                exchange: RabbitMqTopology.PhotoEventsExchange,
+                routingKey: string.Empty,
+                mandatory: true,
+                basicProperties: basicProperties,
+                body: photoUploadBytes,
+                cancellationToken: cancellationToken);
         }
     }
 }

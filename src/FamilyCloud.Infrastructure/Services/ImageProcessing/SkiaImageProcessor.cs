@@ -1,4 +1,5 @@
-﻿using FamilyCloud.Application.Services.FileStorage;
+﻿using FamilyCloud.Application.Exceptions;
+using FamilyCloud.Application.Services.FileStorage;
 using SkiaSharp;
 
 namespace FamilyCloud.Infrastructure.Services.ImageProcessing
@@ -11,7 +12,7 @@ namespace FamilyCloud.Infrastructure.Services.ImageProcessing
 
             if (originalBitmap == null)
             {
-                throw new InvalidOperationException("Не удалось декодировать изображение");
+                throw new InvalidPhotoException("Не удалось декодировать изображение");
             }
 
             int newWidth = originalBitmap.Width;
@@ -19,8 +20,8 @@ namespace FamilyCloud.Infrastructure.Services.ImageProcessing
             if (newWidth > maxWidth || newHeight > maxHeight)
             {
                 double ratio = Math.Min((double)maxWidth / (double)newWidth, (double)maxHeight / (newHeight));
-                newWidth = (int)(originalBitmap.Width * ratio);
-                newHeight = (int)(originalBitmap.Height * ratio);
+                newWidth = Math.Max(1, (int)(originalBitmap.Width * ratio));
+                newHeight = Math.Max(1, (int)(originalBitmap.Height * ratio));
             }
 
             var imageInfo = new SKImageInfo(newWidth, newHeight);
@@ -34,6 +35,11 @@ namespace FamilyCloud.Infrastructure.Services.ImageProcessing
             using var finalImage = SKImage.FromBitmap(resizeBitmap);
 
             var skData = finalImage.Encode(SKEncodedImageFormat.Webp, quality);
+
+            if(skData == null)
+            {
+                throw new InvalidOperationException("Неудалось закодировать изображение");
+            }
 
             return skData.AsStream(true);
         }

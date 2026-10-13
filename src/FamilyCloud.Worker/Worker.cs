@@ -1,7 +1,8 @@
+using FamilyCloud.Application.Exceptions;
 using FamilyCloud.Application.Photos.CreateThumbnail;
 using FamilyCloud.Application.Photos.Events;
 using FamilyCloud.Infrastructure.RabbitMq;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using FamilyCloud.Infrastructure.RabbitMq.Publishers;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -15,16 +16,13 @@ public class Worker : BackgroundService
     private readonly ILogger<Worker> _logger;
     private readonly RabbitMqConnection _rabbitMqConnection;
     private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly RabbitMqOptions _options;
 
     public Worker(
         RabbitMqConnection rabbitMqConnection,
-        IOptions<RabbitMqOptions> options,
         IServiceScopeFactory serviceScopeFactory,
         ILogger<Worker> logger)
     {
         _rabbitMqConnection = rabbitMqConnection;
-        _options = options.Value;
         _serviceScopeFactory = serviceScopeFactory;
         _logger = logger;
     }
@@ -45,7 +43,10 @@ public class Worker : BackgroundService
             cancellationToken: stoppingToken
             );
 
-        await channel.BasicConsumeAsync(_options.ThumbnailQueueName, false, consumer);
+        await channel.BasicConsumeAsync(
+            queue: RabbitMqTopology.ThumbnailQueue,
+            autoAck: false,
+            consumer: consumer);
 
         await Task.Delay(Timeout.Infinite, stoppingToken);
     }
@@ -55,24 +56,66 @@ public class Worker : BackgroundService
         BasicDeliverEventArgs @event,
         CancellationToken cancellationToken)
     {
-        var json = Encoding.UTF8.GetString(@event.Body.ToArray());
-
-        var photoUploaded = JsonSerializer.Deserialize<PhotoUploaded>(json);
-        if(photoUploaded == null)
-        {
-            throw new InvalidOperationException("Не удалось получить Id фотографии");
-        }
-        
         await using var scope =  _serviceScopeFactory.CreateAsyncScope();
 
-        CreateThumbnailService createThumbnailService = scope.ServiceProvider.GetRequiredService<CreateThumbnailService>();
+        try
+        { 
+            var json = Encoding.UTF8.GetString(@event.Body.ToArray());
 
-        _logger.LogInformation("Начинаем создание миниатюры: {PhotoId}", photoUploaded.PhotoId);
+            var photoUploaded = JsonSerializer.Deserialize<PhotoUploaded>(json);
+            if(photoUploaded == null)
+            {
+                throw new InvalidOperationException("Не удалось получить Id фотографии");
+            }
+            
 
-        await createThumbnailService.CreateAsync(photoUploaded.PhotoId, cancellationToken);
+            CreateThumbnailService createThumbnailService = scope.ServiceProvider.GetRequiredService<CreateThumbnailService>();
 
-        _logger.LogInformation("Миниатюра обработана: {PhotoId}", photoUploaded.PhotoId);
-        
+            await createThumbnailService.CreateAsync(photoUploaded.PhotoId, cancellationToken);
+        }
+        catch (OperationCanceledException)
+            when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+        catch(InvalidPhotoException exp)
+        {
+            _logger.LogError(exp, "Ошибка обработки фотографии");
+
+            await channel.BasicRejectAsync(@event.DeliveryTag, false, cancellationToken);
+
+            return;
+        }
+        catch(Exception exp)
+        {
+            _logger.LogError(exp, "Ошибка обработки фотографии");
+
+            int count = 0;
+            if(@event.BasicProperties.Headers != null)
+            {   
+                if(@event.BasicProperties.Headers.TryGetValue("x-retry-count", out object? value))
+                {
+                    if(value is int retryCount)
+                    {
+                        count = retryCount;
+                    }
+                }
+            }
+
+            if(count >= 3)
+            {
+                await channel.BasicRejectAsync(@event.DeliveryTag, false, cancellationToken);
+
+                return;
+            }
+
+            var retryPublisher = scope.ServiceProvider.GetRequiredService<RabbitMqRetryPublisher>();
+            await retryPublisher.PublishAsync(@event.Body,@event.BasicProperties.Headers, count, cancellationToken);
+            await channel.BasicAckAsync(@event.DeliveryTag, false, cancellationToken);
+
+            return;
+        }
+
         await channel.BasicAckAsync(@event.DeliveryTag, false, cancellationToken);
     }
 }
