@@ -1,3 +1,4 @@
+using System.Threading.Channels;
 using RabbitMQ.Client;
 
 namespace FamilyCloud.Infrastructure.RabbitMq.Publishers

@@ -2,6 +2,6 @@
 {
     public interface IEventPublisher
     {
-        Task PublishAsync(PhotoUploaded photoUploaded, CancellationToken cancellationToken);
+        Task PublishAsync(string payload, CancellationToken cancellationToken);
     }
 }

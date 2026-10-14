@@ -43,7 +43,6 @@ namespace FamilyCloud.Infrastructure.Migrations
             modelBuilder.Entity("FamilyCloud.Domain.PhotoFile", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("MimeType")
@@ -69,6 +68,31 @@ namespace FamilyCloud.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("PhotoFiles");
+                });
+
+            modelBuilder.Entity("FamilyCloud.Infrastructure.DataAccess.Outbox.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OutboxMessages");
                 });
 
             modelBuilder.Entity("FamilyCloud.Domain.PhotoFile", b =>

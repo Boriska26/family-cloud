@@ -1,7 +1,9 @@
 using FamilyCloud.Application.Photos.Get;
 using FamilyCloud.Application.Photos.Upload;
+using FamilyCloud.Application.Repositories;
 using FamilyCloud.Infrastructure;
 using FamilyCloud.Infrastructure.RabbitMq;
+using FamilyCloud.Infrastructure.Repositories;
 using FamilyCloud.Infrastructure.Services.FileStorage;
 
 
@@ -14,7 +16,8 @@ builder.Services.AddOpenApi();
 
 builder.Services
     .AddScoped<UploadPhotoService>()
-    .AddScoped<GetPhotoService>();
+    .AddScoped<GetPhotoService>()
+    .AddScoped<IOutboxWriter, OutboxWriter>();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 

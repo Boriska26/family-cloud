@@ -1,8 +1,6 @@
 ﻿using FamilyCloud.Application.Photos.Events;
-using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using System.Text;
-using System.Text.Json;
 
 namespace FamilyCloud.Infrastructure.RabbitMq.Publishers
 {
@@ -15,14 +13,19 @@ namespace FamilyCloud.Infrastructure.RabbitMq.Publishers
             _rabbitMqConnection = rabbitMqConnection;
         }
 
-        public async Task PublishAsync(PhotoUploaded photoUploaded, CancellationToken cancellationToken)
+        public async Task PublishAsync(string payload, CancellationToken cancellationToken)
         {
             var connection = await _rabbitMqConnection.GetConnectionAsync(cancellationToken);
 
-            await using var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
+            CreateChannelOptions createChannelOptions = new CreateChannelOptions(
+                publisherConfirmationsEnabled: true,
+                publisherConfirmationTrackingEnabled: true); 
 
-            string photoUploadJson = JsonSerializer.Serialize(photoUploaded);
-            byte[] photoUploadBytes = Encoding.UTF8.GetBytes(photoUploadJson);
+            await using var channel = await connection.CreateChannelAsync(
+                options: createChannelOptions,
+                cancellationToken: cancellationToken);
+
+            byte[] photoUploadBytes = Encoding.UTF8.GetBytes(payload);
 
             BasicProperties basicProperties = new BasicProperties
             {

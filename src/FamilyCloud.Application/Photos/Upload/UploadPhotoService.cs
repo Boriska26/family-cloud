@@ -10,18 +10,18 @@ namespace FamilyCloud.Application.Photos.Upload
         private readonly IFileStorage _fileStorage;
         private readonly IPhotoRepository _photoRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IEventPublisher _eventPublisher;
+        private readonly IOutboxWriter _outboxWriter;
 
         public UploadPhotoService(
             IFileStorage fileStorage,
             IPhotoRepository photoRepository,
             IUnitOfWork unitOfWork,
-            IEventPublisher eventPublisher)
+            IOutboxWriter outboxWriter)
         {
             _fileStorage = fileStorage;
             _photoRepository = photoRepository;
             _unitOfWork = unitOfWork;
-            _eventPublisher = eventPublisher;
+            _outboxWriter = outboxWriter;
         }
 
         public async Task<Guid> UploadAsync(
@@ -45,11 +45,11 @@ namespace FamilyCloud.Application.Photos.Upload
             photo.MarkAsUploadedAt(DateTimeOffset.UtcNow);
 
             _photoRepository.Add(photo);
+            _outboxWriter.Add(new PhotoUploaded(photo.Id));
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
 
-            await _eventPublisher.PublishAsync(new PhotoUploaded(photo.Id), cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
 
             return photo.Id;
         }
