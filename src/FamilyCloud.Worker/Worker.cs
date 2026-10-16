@@ -3,7 +3,6 @@ using FamilyCloud.Application.Photos.CreateThumbnail;
 using FamilyCloud.Application.Photos.Events;
 using FamilyCloud.Infrastructure.RabbitMq;
 using FamilyCloud.Infrastructure.RabbitMq.Publishers;
-using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;

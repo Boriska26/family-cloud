@@ -5,5 +5,7 @@
         Task SaveChangesAsync(CancellationToken cancellationToken);
 
         Task<ITransaction> BeginTransactionAsync(CancellationToken cancellationToken);
+
+        Task AcquireBootstrapLockAsync(CancellationToken cancellationToken);
     }
 }

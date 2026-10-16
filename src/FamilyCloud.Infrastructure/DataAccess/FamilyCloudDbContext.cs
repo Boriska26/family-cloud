@@ -15,12 +15,20 @@ namespace FamilyCloud.Infrastructure.DataAccess
 
         public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
+        public DbSet<User> Users => Set<User>();
+
+        public DbSet<Person> Persons => Set<Person>();
+
+        public DbSet<Invitation> Invitations => Set<Invitation>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.ApplyConfiguration(new InvitationConfiguration());
             modelBuilder.ApplyConfiguration(new PhotoConfiguration());
             modelBuilder.ApplyConfiguration(new PhotoFileConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
         }
     }
 }

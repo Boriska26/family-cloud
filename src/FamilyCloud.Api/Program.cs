@@ -1,10 +1,13 @@
 using FamilyCloud.Application.Photos.Get;
 using FamilyCloud.Application.Photos.Upload;
 using FamilyCloud.Application.Repositories;
+using FamilyCloud.Application.Services;
+using FamilyCloud.Application.Services.Securities;
 using FamilyCloud.Infrastructure;
 using FamilyCloud.Infrastructure.RabbitMq;
 using FamilyCloud.Infrastructure.Repositories;
 using FamilyCloud.Infrastructure.Services.FileStorage;
+using FamilyCloud.Infrastructure.Services.Securities;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,13 +20,18 @@ builder.Services.AddOpenApi();
 builder.Services
     .AddScoped<UploadPhotoService>()
     .AddScoped<GetPhotoService>()
-    .AddScoped<IOutboxWriter, OutboxWriter>();
+    .AddScoped<IOutboxWriter, OutboxWriter>()
+    .AddScoped<IInvitationRepository, InvitationRepository>()
+    .AddScoped<IUserRepository, UserRepository>()
+    .AddScoped<IPersonRepository, PersonRepository>()
+    .AddScoped<CreateInvitationService>();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddTransient<RabbitMqTopologyInitializer>();
-
 builder.Services.AddSingleton<RabbitMqConnection>();
+
+builder.Services.AddSingleton<IInvitationTokenService, InvitationTokenService>();
 
 builder.Services.AddControllers();
 

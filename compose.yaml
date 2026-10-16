@@ -67,6 +67,20 @@ services:
     volumes:
       - /home/boris/FamilyCloudData:/app/photos
 
+  bootstrap:
+    build:
+      context: .
+      dockerfile: src/FamilyCloud.Bootstrap/Dockerfile
+    profiles:
+      - tools
+    environment:
+      ConnectionStrings__familydatabase_test: "Host=postgres;Port=5432;Database=familycloud_test;Username=boris;Password=${POSTGRES_PASSWORD}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+
 volumes:
   database:
   rabbitmq_data:

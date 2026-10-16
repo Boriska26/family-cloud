@@ -1,5 +1,7 @@
 ﻿using FamilyCloud.Application.Repositories;
 using FamilyCloud.Infrastructure.DataAccess;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FamilyCloud.Infrastructure.Repositories
 {
@@ -22,6 +24,18 @@ namespace FamilyCloud.Infrastructure.Repositories
         public async Task SaveChangesAsync(CancellationToken cancellationToken)
         {
             await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task AcquireBootstrapLockAsync(CancellationToken cancellationToken)
+        {
+            var connection = _context.Database.GetDbConnection();
+            await using var command = connection.CreateCommand();
+
+            command.CommandText = "SELECT pg_advisory_xact_lock(12345)";
+
+            command.Transaction = _context.Database.CurrentTransaction!.GetDbTransaction();
+
+            await command.ExecuteNonQueryAsync(cancellationToken);
         }
     }
 }
