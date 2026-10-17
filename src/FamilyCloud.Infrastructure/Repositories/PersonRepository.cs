@@ -1,6 +1,7 @@
 using FamilyCloud.Application.Repositories;
 using FamilyCloud.Domain;
 using FamilyCloud.Infrastructure.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace FamilyCloud.Infrastructure.Repositories
 {
@@ -20,7 +21,12 @@ namespace FamilyCloud.Infrastructure.Repositories
 
         public async Task<Person?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return await _dbContext.Persons.FindAsync(id, cancellationToken);
+            return await _dbContext.Persons.AsNoTracking().FirstOrDefaultAsync(n => n.Id == id, cancellationToken);
+        }
+
+        public async Task<Person?> GetTrackedByIdAsync(Guid id, CancellationToken cancellationToken)
+        {
+            return await _dbContext.Persons.FirstOrDefaultAsync(n => n.Id == id, cancellationToken);
         }
     }
 }

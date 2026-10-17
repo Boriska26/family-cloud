@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using FamilyCloud.Api.ExceptionHandlers;
+using FamilyCloud.Application.Exceptions;
 using FamilyCloud.Application.Photos.Get;
 using FamilyCloud.Application.Photos.Upload;
 using FamilyCloud.Application.Repositories;
@@ -21,6 +23,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddOptionsWithValidateOnStart<JwtTokenOptions, JwtTokenOptionsValidator>()
     .Bind(builder.Configuration.GetSection("Jwt"));
+
+builder.Services.AddExceptionHandler<ForbiddenExceptionHandler>()
+    .AddExceptionHandler<NotFoundExceptionHandler>()
+    .AddExceptionHandler<GlobalExceptionHandler>();
+
 builder.Services
     .AddScoped<UploadPhotoService>()
     .AddScoped<GetPhotoService>()
@@ -31,6 +38,7 @@ builder.Services
     .AddScoped<CreateInvitationService>()
     .AddScoped<IPasswordHasherService, PasswordHasherService>()
     .AddScoped<IJwtTokenService, JwtTokenService>()
+    .AddScoped<PersonService>()
     .AddScoped<LoginService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

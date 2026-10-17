@@ -7,5 +7,7 @@ namespace FamilyCloud.Application.Repositories
         Task<Person?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
         void Add(Person person);
+
+        Task<Person?> GetTrackedByIdAsync(Guid id, CancellationToken cancellationToken);
     }
 }
