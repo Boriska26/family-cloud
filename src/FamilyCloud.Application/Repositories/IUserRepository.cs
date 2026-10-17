@@ -10,6 +10,8 @@ namespace FamilyCloud.Application.Repositories
 
         Task<bool> HasAdministratorAsync(CancellationToken cancellationToken);
 
+        Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken);
+
         void Add(User person);
     }
 }

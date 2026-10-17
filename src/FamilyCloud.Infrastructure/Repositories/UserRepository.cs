@@ -26,12 +26,18 @@ namespace FamilyCloud.Infrastructure.Repositories
 
         public Task<bool> HasAdministratorAsync(CancellationToken cancellationToken)
         {
-            return _dbContext.Users.AnyAsync(n=>n.Role == Role.Administrator, cancellationToken);
+            return _dbContext.Users.AnyAsync(n => n.Role == Role.Administrator, cancellationToken);
         }
 
         public void Add(User user)
         {
             _dbContext.Users.Add(user);
+        }
+
+        public async Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken)
+        {
+            var lowerLogin = login.ToLowerInvariant();
+            return await _dbContext.Users.FirstOrDefaultAsync(n => n.Login == lowerLogin, cancellationToken);
         }
     }
 }

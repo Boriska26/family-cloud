@@ -45,6 +45,7 @@ services:
     environment:
       FileStorage__RootPath: /app/photos
       RabbitMq__Password: ${RABBITMQ_PASSWORD}
+      Jwt__SigningKey: ${SIGNING_KEY}
       ConnectionStrings__familydatabase_test: "Host=postgres;Port=5432;Database=familycloud_test;Username=boris;password=${POSTGRES_PASSWORD}"
     ports:
       - "80:8080"

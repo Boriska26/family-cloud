@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FamilyCloud.Api.Controllers
 {
+    [ApiController]
     [Route("api/photos")]
-    public class PhotoController : Controller
+    public class PhotoController : ControllerBase
     {
         [HttpPost]
         public async Task<ActionResult<Guid>> UploadPhoto(

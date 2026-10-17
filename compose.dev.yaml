@@ -1,0 +1,12 @@
+services:
+  api:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "8080:8080"
+    volumes:
+      - ${HOME}/FamilyCloudDataDev:/app/photos
+
+  worker:
+    volumes:
+      - ${HOME}/FamilyCloudDataDev:/app/photos
