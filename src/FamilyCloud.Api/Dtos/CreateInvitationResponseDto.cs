@@ -1,0 +1,1 @@
+public record CreateInvitationResponseDto(string Token);

@@ -18,7 +18,7 @@ namespace FamilyCloud.Domain
 
             Id = Guid.NewGuid();
             IsBlocked = false;
-            Login = userSetting.Login.ToLowerInvariant();
+            Login = userSetting.Login.Trim().ToLowerInvariant();
             PasswordHash = userSetting.PasswordHash;
             CreatedAt = DateTimeOffset.UtcNow;
             Role = role;

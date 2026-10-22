@@ -3,11 +3,13 @@ using FamilyCloud.Application.Photos.CreateThumbnail;
 using FamilyCloud.Application.Photos.Get;
 using FamilyCloud.Application.Photos.Upload;
 using FamilyCloud.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FamilyCloud.Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/photos")]
     public class PhotoController : ControllerBase
     {
@@ -54,6 +56,7 @@ namespace FamilyCloud.Api.Controllers
             return Ok(result);
         }
 
+#if DEBUG
         [HttpPost("{id:guid}/thumbnail")]
         public async Task<IActionResult> CreateThumbnail(
             Guid id,
@@ -64,6 +67,7 @@ namespace FamilyCloud.Api.Controllers
 
             return NoContent();
         }
+#endif
 
         [HttpGet("{id:guid}/thumbnail")]
         public async Task<IActionResult> GetThumbnail(

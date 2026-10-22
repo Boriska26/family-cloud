@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="FamilyCloud.Mobile.Views.LoginPage"
+    Shell.NavBarIsVisible="False">
+
+    <Grid>
+
+        <!-- Фон -->
+        <Image
+            Source="login_background.png"
+            Aspect="AspectFill" />
+
+        <!-- Содержимое -->
+        <VerticalStackLayout
+            Padding="32"
+            Spacing="20"
+            TranslationY="70"
+            VerticalOptions="Center">
+
+            <Label
+                Text="FamilyCloud"
+                FontSize="42"
+                VerticalOptions="Start"
+                FontAttributes="Bold"
+                TextColor="#17385D"
+                HorizontalOptions="Center" />
+
+            <Label
+                Text="Ваши самые важные моменты всегда рядом ❤️"
+                FontSize="17"
+                TextColor="#60799B"
+                HorizontalTextAlignment="Center" />
+
+            <Border BackgroundColor="#F2FFFFFF"
+                Stroke="#D5E3F0"
+                StrokeShape="RoundRectangle 25"
+                StrokeThickness="1"
+                Padding="16,4">
+                <Entry
+                    Text="{Binding Login}"
+                    Placeholder="Логин"
+                    BackgroundColor="White"
+                    TextColor="#17385D" />
+            </Border>
+
+            <Border BackgroundColor="#F2FFFFFF"
+                Stroke="#D5E3F0"
+                StrokeShape="RoundRectangle 25"
+                StrokeThickness="1"
+                Padding="16,4">
+            <Entry
+                Placeholder="Пароль"
+                Text="{Binding Password}"
+                IsPassword="True"
+                BackgroundColor="White"
+                TextColor="#17385D" />
+            </Border>
+
+            <Button
+                Text="Войти"
+                BackgroundColor="#1DA9D7"
+                TextColor="White"
+                CornerRadius="24"
+                Command="{Binding LoginCommand}"
+                HeightRequest="56" />
+
+            <Button
+                Text="Войти по приглашению"
+                CornerRadius="24"
+                HorizontalOptions="Center"
+                BackgroundColor="#D5E3F0"
+                TextColor="#0876C8" />
+            
+
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace FamilyCloud.Domain
 {
     public class Invitation
@@ -11,11 +9,11 @@ namespace FamilyCloud.Domain
             if (invitationSetting == null)
                 throw new ArgumentNullException(nameof(invitationSetting));
             if (invitationSetting.InvitedByUserId == Guid.Empty)
-                throw new ArgumentException("InvitedUserId cannot be empty");
+                throw new ArgumentException("InvitedByUserId cannot be empty");
             if (invitationSetting.PersonId == Guid.Empty)
                 throw new ArgumentException("PersonId cannot be empty");
 
-            ArgumentException.ThrowIfNullOrWhiteSpace(nameof(invitationSetting.TokenHash));
+            ArgumentException.ThrowIfNullOrWhiteSpace(invitationSetting.TokenHash);
 
             Id = Guid.NewGuid();
             CreatedAt = DateTimeOffset.UtcNow;

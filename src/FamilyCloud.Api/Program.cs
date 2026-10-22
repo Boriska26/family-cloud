@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using FamilyCloud.Api.ExceptionHandlers;
+using FamilyCloud.Api.Models;
+using FamilyCloud.Application;
 using FamilyCloud.Application.Exceptions;
 using FamilyCloud.Application.Photos.Get;
 using FamilyCloud.Application.Photos.Upload;
@@ -26,7 +28,11 @@ builder.Services.AddOptionsWithValidateOnStart<JwtTokenOptions, JwtTokenOptionsV
 
 builder.Services.AddExceptionHandler<ForbiddenExceptionHandler>()
     .AddExceptionHandler<NotFoundExceptionHandler>()
+    .AddExceptionHandler<ConflictExceptionHandler>()
+    .AddExceptionHandler<ValidationExceptionHandler>()
+    .AddExceptionHandler<InvalidInvitationExceptionHandler>()
     .AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services
     .AddScoped<UploadPhotoService>()
@@ -39,7 +45,11 @@ builder.Services
     .AddScoped<IPasswordHasherService, PasswordHasherService>()
     .AddScoped<IJwtTokenService, JwtTokenService>()
     .AddScoped<PersonService>()
+    .AddScoped<ICurrentUser, CurrentUser>()
+    .AddScoped<AcceptInvitationService>()
     .AddScoped<LoginService>();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -108,7 +118,7 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
-
+app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 

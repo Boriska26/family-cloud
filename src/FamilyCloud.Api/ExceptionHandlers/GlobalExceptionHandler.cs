@@ -19,13 +19,13 @@ public class GlobalExceptionHandler : IExceptionHandler
         var problemDetails = new ProblemDetails
         {
             Status = StatusCodes.Status500InternalServerError,
-            Title = "Не предвиденая ошибка",
+            Title = "Непредвиденная ошибка",
             Detail = "Произошла внутренняя ошибка сервера"
         };
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;
 
-        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+        await Results.Problem(problemDetails).ExecuteAsync(httpContext);
 
         return true;
     }

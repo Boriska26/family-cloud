@@ -10,5 +10,9 @@ namespace FamilyCloud.Application.Repositories
             Guid personId,
             DateTimeOffset now,
             CancellationToken cancellationToken);
+
+            Task<Invitation?> GetTrackingByTokenHashAsync(
+                string tokenHash,
+                CancellationToken cancellationToken);
     }
 }

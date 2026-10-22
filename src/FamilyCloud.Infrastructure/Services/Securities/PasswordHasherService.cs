@@ -7,10 +7,6 @@ namespace FamilyCloud.Infrastructure.Services.Securities
     {
         private readonly PasswordHasher<object> _passwordHasher = new();
 
-        public PasswordHasherService()
-        {
-        }
-
         public string HashPassword(string password)
         {
             return _passwordHasher.HashPassword(null!, password);

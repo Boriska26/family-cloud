@@ -1,6 +1,7 @@
 using FamilyCloud.Application.Repositories;
 using FamilyCloud.Domain;
 using FamilyCloud.Infrastructure.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace FamilyCloud.Infrastructure.Repositories
 {
@@ -18,9 +19,20 @@ namespace FamilyCloud.Infrastructure.Repositories
             _dbContext.Invitations.Add(invitation);
         }
 
-        public Task<List<Invitation>> GetActiveByPersonIdAsync(Guid personId, DateTimeOffset now, CancellationToken cancellationToken)
+        public Task<List<Invitation>> GetActiveByPersonIdAsync(
+            Guid personId,
+            DateTimeOffset now,
+            CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Invitation?> GetTrackingByTokenHashAsync(string tokenHash, CancellationToken cancellationToken)
+        {
+            Invitation? invitation = await _dbContext
+                .Invitations.FirstOrDefaultAsync(n => n.TokenHash == tokenHash, cancellationToken);
+
+            return invitation;
         }
     }
 }

@@ -12,6 +12,7 @@ namespace FamilyCloud.Infrastructure.DataAccess.Configurations
             builder.HasOne(n => n.InvitedByUser).WithMany().HasForeignKey(n=>n.InvitedByUserId).OnDelete(DeleteBehavior.Restrict);
             builder.HasIndex(n=>n.Login).IsUnique();
             builder.Property(u => u.Login).HasMaxLength(100);
+            builder.HasIndex(u=>u.PersonId).IsUnique();
         }
     }
 }

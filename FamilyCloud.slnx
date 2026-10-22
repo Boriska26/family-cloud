@@ -4,8 +4,12 @@
     <Project Path="src/FamilyCloud.Application/FamilyCloud.Application.csproj" Id="4cb6f98a-2df7-48fe-bd0c-b1d029705205" />
     <Project Path="src/FamilyCloud.Bootstrap/FamilyCloud.Bootstrap.csproj" />
     <Project Path="src/FamilyCloud.Infrastructure/FamilyCloud.Infrastructure.csproj" Id="dfaa7873-2b4f-4367-b925-e0a3a86fef1d" />
+    <Project Path="src/FamilyCloud.Mobile/FamilyCloud.Mobile.csproj" />
     <Project Path="src/FamilyCloud.Worker/FamilyCloud.Worker.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FamilyCloud.IntegrationTests/FamilyCloud.IntegrationTests.csproj" />
+  </Folder>S
   <Folder Name="/Элементы решения/">
     <File Path="compose.yaml" />
   </Folder>

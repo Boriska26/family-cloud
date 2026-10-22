@@ -12,6 +12,6 @@ namespace FamilyCloud.Application.Repositories
 
         Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken);
 
-        void Add(User person);
+        void Add(User user);
     }
 }

@@ -44,6 +44,8 @@ services:
       dockerfile: "src/FamilyCloud.Api/Dockerfile"
     environment:
       FileStorage__RootPath: /app/photos
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Port: "5672"
       RabbitMq__Password: ${RABBITMQ_PASSWORD}
       Jwt__SigningKey: ${SIGNING_KEY}
       ConnectionStrings__familydatabase_test: "Host=postgres;Port=5432;Database=familycloud_test;Username=boris;password=${POSTGRES_PASSWORD}"

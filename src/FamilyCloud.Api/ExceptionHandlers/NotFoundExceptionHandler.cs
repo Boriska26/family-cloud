@@ -22,7 +22,7 @@ public class NotFoundExceptionHandler : IExceptionHandler
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;
 
-        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+        await Results.Problem(problemDetails).ExecuteAsync(httpContext);
 
         return true;
     }
